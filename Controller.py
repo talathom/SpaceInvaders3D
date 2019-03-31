@@ -1,4 +1,5 @@
 ﻿from Player import *
+from Alien import *
 
 class Controller (viz.EventClass):
 
@@ -10,6 +11,8 @@ class Controller (viz.EventClass):
 		self.callback(viz.KEYDOWN_EVENT, self.onKeyDown) # Callback for key press
 		self.callback(viz.TIMER_EVENT, self.onTimer) # Callback for timers
 		self.callback(viz.KEYUP_EVENT, self.onKeyUp)
+		
+		self.aliens = list()
 		
 		self.leftUp = True
 		self.rightUp = True
@@ -25,6 +28,15 @@ class Controller (viz.EventClass):
 		self.starttimer(1, .05, viz.FOREVER)
 		self.starttimer(2, .05, viz.FOREVER)
 		self.addCoordinateAxes()
+		self.spawnAliens()\
+		
+	def spawnAliens(self):
+		x = -.6
+		for i in range(0, 7):
+			self.aliens.append(Alien())
+			self.aliens[i].setPosition(x, 0, 0)
+			x += .2
+		
 		
 	def onKeyDown(self, key):
 		if key == 'a' or key == viz.KEY_LEFT:
@@ -43,7 +55,6 @@ class Controller (viz.EventClass):
 			
 	def onTimer(self, num):
 		if num == 1:
-			print(str(self.playerShip.theta))
 			if not self.leftUp:
 				self.playerShip.setPosition(self.playerShip.getX()-.025, self.playerShip.getY(), self.playerShip.getZ())
 				if self.playerShip.theta < 45:
