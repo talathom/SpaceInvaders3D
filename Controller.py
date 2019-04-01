@@ -59,7 +59,6 @@ class Controller (viz.EventClass):
 			self.rightUp = False
 			
 		if key == '1':
-			# This Code has bugs in it
 			self.theta = 50
 			mat = viz.Matrix()
 			mat.postTrans(0, 0, -2)
@@ -99,11 +98,11 @@ class Controller (viz.EventClass):
 		if num == 1:
 			if not self.leftUp and self.playerShip.canGoLeft(-0.25):
 				self.playerShip.setPosition(self.playerShip.getX()-.025, self.playerShip.getY(), self.playerShip.getZ())
-				if self.playerShip.theta < 45:
+				if self.playerShip.theta < 45 or self.playerShip.theta >= 315:
 					self.playerShip.rotate(9)
 			if not self.rightUp and self.playerShip.canGoRight(0.25):
 				self.playerShip.setPosition(self.playerShip.getX()+.025, self.playerShip.getY(), self.playerShip.getZ())
-				if self.playerShip.theta > 315 and self.playerShip.theta <= 360 or self.playerShip.theta  == 0 :
+				if self.playerShip.theta > 315 and self.playerShip.theta <= 360 or self.playerShip.theta <= 45:
 					self.playerShip.rotate(351)
 		if num == 2:
 			if self.leftUp and self.rightUp:
