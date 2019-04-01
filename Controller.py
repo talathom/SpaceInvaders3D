@@ -62,8 +62,8 @@ class Controller (viz.EventClass):
 			# This Code has bugs in it
 			self.theta = 50
 			mat = viz.Matrix()
+			mat.postTrans(0, 0, -2)
 			mat.postAxisAngle(1, 0, 0, self.theta)
-			mat.postTrans(0, 0, 0)
 			self.view.setMatrix(mat)
 			
 		if key == '2':
@@ -71,6 +71,20 @@ class Controller (viz.EventClass):
 			mat = viz.Matrix()
 			mat.postAxisAngle(1, 0, 0, self.theta)
 			mat.postTrans(0, 2, 0)
+			self.view.setMatrix(mat)
+			
+		if key == '3':
+			self.theta = 90
+			mat = viz.Matrix()
+			mat.postAxisAngle(0, 1, 0, self.theta)
+			mat.postTrans(-1.5, 0, 0)
+			self.view.setMatrix(mat)
+			
+		if key == '4':
+			self.theta = 270
+			mat = viz.Matrix()
+			mat.postAxisAngle(0, 1, 0, self.theta)
+			mat.postTrans(1.5, 0, 0)
 			self.view.setMatrix(mat)
 			
 	def onKeyUp(self, key):
