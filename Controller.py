@@ -13,29 +13,42 @@ class Controller (viz.EventClass):
 		self.callback(viz.KEYUP_EVENT, self.onKeyUp)
 		
 		self.aliens = list()
+		self.theta = 50
 		
 		self.leftUp = True
 		self.rightUp = True
 		self.Fire = False
 		
-		view = viz.MainView
+		self.view = viz.MainView
 		mat = viz.Matrix()
-		mat.postAxisAngle(1, 0, 0, 50)
+		mat.postAxisAngle(1, 0, 0, self.theta)
 		mat.postTrans(0, 0, 0)
-		view.setMatrix(mat)
+		self.view.setMatrix(mat)
+		
 		self.playerShip = Player()
 		self.playerShip.setPosition(0, 0, -.6)
 		self.starttimer(1, .05, viz.FOREVER)
 		self.starttimer(2, .05, viz.FOREVER)
 		self.addCoordinateAxes()
-		self.spawnAliens()\
+		self.spawnAliens()
 		
 	def spawnAliens(self):
 		x = -.6
-		for i in range(0, 7):
+		for i in range(0, 6):
 			self.aliens.append(Alien())
-			self.aliens[i].setPosition(x, 0, 0)
-			x += .2
+			self.aliens[i].setPosition(x, 0, 1)
+			x += .25
+		
+		x = -.6
+		for i in range(6, 12):
+			self.aliens.append(Alien())
+			self.aliens[i].setPosition(x, 0, .75)
+			x += .25
+		x = -.6
+		for i in range(12, 18):
+			self.aliens.append(Alien())
+			self.aliens[i].setPosition(x, 0, .5)
+			x += .25
 		
 		
 	def onKeyDown(self, key):
@@ -44,6 +57,21 @@ class Controller (viz.EventClass):
 		
 		if key == 'd' or key == viz.KEY_RIGHT:
 			self.rightUp = False
+			
+		if key == '1':
+			# This Code has bugs in it
+			self.theta = 50
+			mat = viz.Matrix()
+			mat.postAxisAngle(1, 0, 0, self.theta)
+			mat.postTrans(0, 0, 0)
+			self.view.setMatrix(mat)
+			
+		if key == '2':
+			self.theta = 90
+			mat = viz.Matrix()
+			mat.postAxisAngle(1, 0, 0, self.theta)
+			mat.postTrans(0, 2, 0)
+			self.view.setMatrix(mat)
 			
 	def onKeyUp(self, key):
 		if key == "a" or key == viz.KEY_LEFT:
@@ -55,11 +83,11 @@ class Controller (viz.EventClass):
 			
 	def onTimer(self, num):
 		if num == 1:
-			if not self.leftUp:
+			if not self.leftUp and self.playerShip.canGoLeft(-0.25):
 				self.playerShip.setPosition(self.playerShip.getX()-.025, self.playerShip.getY(), self.playerShip.getZ())
 				if self.playerShip.theta < 45:
 					self.playerShip.rotate(9)
-			if not self.rightUp:
+			if not self.rightUp and self.playerShip.canGoRight(0.25):
 				self.playerShip.setPosition(self.playerShip.getX()+.025, self.playerShip.getY(), self.playerShip.getZ())
 				if self.playerShip.theta > 315 and self.playerShip.theta <= 360 or self.playerShip.theta  == 0 :
 					self.playerShip.rotate(351)

@@ -6,13 +6,13 @@ class Alien():
 		self.y = 0
 		self.z = 0
 		self.theta = 0
-		self.alien = Model('ArrowUFO.fbx')
+		self.alien = Model('model.dae')
 	
 	def setPosition(self, x, y, z):
 		self.x = x
 		self.y = y
 		self.z = z
-		self.alien.setOrientation(self.x, self.y, self.z, .0005, 180, self.theta)
+		self.alien.setOrientation(self.x, self.y, self.z, .0025, 180, self.theta)
 		
 	def getX(self):
 		return self.x

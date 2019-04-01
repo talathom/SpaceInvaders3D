@@ -27,6 +27,18 @@ class Player():
 		self.playerShip.setZRotation(zrot)
 		self.playerShip.setOrientation(self.x, self.y, self.z, 2, 180, self.theta)
 		
+	def canGoRight(self, rateOfMovement):
+		if self.x  + rateOfMovement > 1:
+			return False
+		else: 
+			return True
+		
+	def canGoLeft(self, rateOfMovement):
+		if self.x  + rateOfMovement < -1:
+			return False
+		else: 
+			return True
+		
 	def getX(self):
 		return self.x
 		
