@@ -1,5 +1,6 @@
 ﻿from Player import *
 from Alien import *
+from Bullet import *
 
 class Controller (viz.EventClass):
 
@@ -12,6 +13,7 @@ class Controller (viz.EventClass):
 		self.callback(viz.TIMER_EVENT, self.onTimer) # Callback for timers
 		self.callback(viz.KEYUP_EVENT, self.onKeyUp)
 		
+		self.bulletlist = []
 		self.aliens = list()
 		self.theta = 50
 		
@@ -29,6 +31,7 @@ class Controller (viz.EventClass):
 		self.playerShip.setPosition(0, 0, -.6)
 		self.starttimer(1, .05, viz.FOREVER)
 		self.starttimer(2, .05, viz.FOREVER)
+		self.starttimer(3, .001, viz.FOREVER)
 		self.addCoordinateAxes()
 		self.spawnAliens()
 		
@@ -85,6 +88,11 @@ class Controller (viz.EventClass):
 			mat.postAxisAngle(0, 1, 0, self.theta)
 			mat.postTrans(1.5, 0, 0)
 			self.view.setMatrix(mat)
+		
+		if key == " ":
+			b = Bullet()
+			b.setPosition(self.playerShip.getX(),self.playerShip.getY(),self.playerShip.getZ())
+			self.bulletlist.append(b)
 			
 	def onKeyUp(self, key):
 		if key == "a" or key == viz.KEY_LEFT:
@@ -110,6 +118,15 @@ class Controller (viz.EventClass):
 					self.playerShip.rotate(351)
 				if self.playerShip.theta >= 315:
 					self.playerShip.rotate(9)
+		
+		for i in range (0, len(self.bulletlist)):
+			x = self.bulletlist[i].getX()
+			vx = self.bulletlist[i].getVX()
+			y = self.bulletlist[i].getY()
+			vy = self.bulletlist[i].getVY()
+			z = self.bulletlist[i].getZ()
+			vz = self.bulletlist[i].getVZ()
+			self.bulletlist[i].setPosition(x + vx, y + vy, z + vz)
 				
 	def addCoordinateAxes(self):
 		viz.startLayer(viz.LINES)

@@ -12,7 +12,7 @@ class Alien():
 		self.x = x
 		self.y = y
 		self.z = z
-		self.alien.setOrientation(self.x, self.y, self.z, .0025, 180, self.theta)
+		self.alien.setOrientation(self.x, self.y, self.z, .0025, 180, self.theta,0)
 		
 	def getX(self):
 		return self.x

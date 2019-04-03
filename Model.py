@@ -23,6 +23,7 @@ class Model():
 		# model's rotation about the Y axis (in degrees)
 		self.yrot = 0
 		self.zrot = 0
+		self.xrot = 0
 		self.setTransMatrix()
 
 	# setter for location of the model	
@@ -65,18 +66,26 @@ class Model():
 	def getZRotation(self):
 		return self.zrot
 		
+	def setXRotation(self, xrot):
+		self.xrot += xrot
+		self.setTransMatrix()
+		
+	def getXRotation(self):
+		return self.xrot	
+		
 	# get the model's scene graph node
 	def getNode(self):
 		return self.node
 		
 	# set model's x,y,z, scale and rotation
-	def setOrientation(self,x,y,z,s,yrot,zrot):
+	def setOrientation(self,x,y,z,s,yrot,zrot,xrot):
 		self.x = x
 		self.y = y
 		self.z = z
 		self.s = s
 		self.yrot = yrot
 		self.zrot = zrot
+		self.xrot = xrot
 		self.setTransMatrix()
 		
 	def setTransMatrix(self):
@@ -84,5 +93,6 @@ class Model():
 		mat.postScale(self.s,self.s,self.s)
 		mat.postAxisAngle(0,1,0, self.yrot)
 		mat.postAxisAngle(0,0,1, self.zrot)
+		mat.postAxisAngle(1,0,0, self.xrot)
 		mat.postTrans(self.x,self.y,self.z)
 		self.node.setMatrix( mat )

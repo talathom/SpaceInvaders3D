@@ -18,14 +18,14 @@ class Player():
 		self.x = x
 		self.y = y
 		self.z = z
-		self.playerShip.setOrientation(self.x, self.y, self.z, 2, 180, self.theta)
+		self.playerShip.setOrientation(self.x, self.y, self.z, 2, 180, self.theta,0)
 		
 	def rotate(self, zrot):
 		self.theta += zrot
 		if self.theta >= 360:
 			self.theta -= 360
 		self.playerShip.setZRotation(zrot)
-		self.playerShip.setOrientation(self.x, self.y, self.z, 2, 180, self.theta)
+		self.playerShip.setOrientation(self.x, self.y, self.z, 2, 180, self.theta,0)
 		
 	def canGoRight(self, rateOfMovement):
 		if self.x  + rateOfMovement > 1:
