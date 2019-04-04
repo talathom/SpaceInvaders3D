@@ -47,6 +47,7 @@ class Model():
 	def setScale(self, s ):
 		self.s = s
 		self.setTransMatrix()
+		
 	def getScale(self):
 		return self.s
 		

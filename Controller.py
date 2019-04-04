@@ -26,6 +26,7 @@ class Controller (viz.EventClass):
 		self.rightUp = True
 		self.Fire = False
 		self.start = False
+		self.pause = False
 		
 		#Setup default camera view
 		self.view = viz.MainView
@@ -42,26 +43,29 @@ class Controller (viz.EventClass):
 		self.starttimer(1, .05, viz.FOREVER)
 		self.starttimer(2, .05, viz.FOREVER)
 		self.starttimer(3, .001, viz.FOREVER)
-		self.starttimer(4, .5, viz.FOREVER) #Controls aliens
+		self.starttimer(5, .3, viz.FOREVER)
 		self.addCoordinateAxes()
 		self.spawnAliens()
 		
 	def spawnAliens(self):
 		# Spawns 3x6 aliens
+		model = 'blueAlien.dae'
 		x = -.6
 		for i in range(0, 6):
-			self.aliens.append(Alien())
+			self.aliens.append(Alien(model))
 			self.aliens[i].setPosition(x, 0, 1)
 			x += .25
 		
 		x = -.6
 		for i in range(6, 12):
-			self.aliens.append(Alien())
+			self.aliens.append(Alien(model))
 			self.aliens[i].setPosition(x, 0, .75)
 			x += .25
+			
+		model = 'redAlien.dae'
 		x = -.6
 		for i in range(12, 18):
-			self.aliens.append(Alien())
+			self.aliens.append(Alien(model))
 			self.aliens[i].setPosition(x, 0, .5)
 			x += .25		
 		
@@ -71,6 +75,12 @@ class Controller (viz.EventClass):
 		
 		if key == 'd' or key == viz.KEY_RIGHT:
 			self.rightUp = False
+			
+		if key == "p":
+			if self.pause:
+				self.pause = False
+			else:
+				self.pause = True
 			
 		# Default Camera
 		if key == '1':
@@ -105,12 +115,13 @@ class Controller (viz.EventClass):
 			self.view.setMatrix(mat)
 			
 		if key == '0':
-			self.start = True
+			self.starttimer(4, .005, viz.FOREVER)
 		
-		if key == " ":
+		if key == " " and self.Fire:
 			b = Bullet()
-			b.setPosition(self.playerShip.getX(),self.playerShip.getY(),self.playerShip.getZ())
+			b.setPosition(self.playerShip.getX()-.02,self.playerShip.getY()+.02,self.playerShip.getZ())
 			self.bulletlist.append(b)
+			self.Fire = False
 			
 	def onKeyUp(self, key):
 		#Controls booleans for key presses, reactions are done by timers
@@ -139,6 +150,7 @@ class Controller (viz.EventClass):
 					self.playerShip.rotate(9)
 		
 		if num == 3:
+			#Move bullet
 			for bullet in self.bulletlist:
 				x = bullet.getX()
 				vx = bullet.getVX()
@@ -147,9 +159,29 @@ class Controller (viz.EventClass):
 				z = bullet.getZ()
 				vz = bullet.getVZ()
 				bullet.setPosition(x + vx, y + vy, z + vz)
+				#Deallocate bullets
 				if(bullet.getZ() > 2):
 					bullet.delete()
 					self.bulletlist.remove(bullet)
+				# Check bullet to alien collison
+				for alien in self.aliens:
+					if bullet.getX() > alien.getX()-.1 and bullet.getX() < alien.getX()+.1 and bullet.getZ() > alien.getZ()-.1 and bullet.getZ() < alien.getZ()+.1:
+						bullet.delete()
+						self.bulletlist.remove(bullet)
+						alien.delete()
+						self.aliens.remove(alien)
+					
+		if num == 4 and not self.pause:
+			# Move aliens
+			for alien in self.aliens:
+				alien.setPosition(alien.getX(), alien.getY(), alien.getZ() - .001)
+				if self.playerShip.getX()+.04 > alien.getX()-.1 and self.playerShip.getX()-.04 < alien.getX()+.1 and self.playerShip.getZ()+.06 > alien.getZ()-.1 and self.playerShip.getZ()-.06 < alien.getZ()+.1:
+					self.playerShip.delete()
+				if alien.isOffScreen():
+					alien.setPosition(alien.getX(), alien.getY(), 1)
+		
+		if num == 5:
+			self.Fire = True
 					
 				
 	def addCoordinateAxes(self):

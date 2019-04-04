@@ -1,12 +1,12 @@
 ﻿from Model import *
 
 class Alien():
-	def __init__(self):
+	def __init__(self, model):
 		self.x = 0
 		self.y = 0
 		self.z = 0
 		self.theta = 0
-		self.alien = Model('alien.dae')
+		self.alien = Model(model)
 	
 	# Move the alien around on x, y, z no rotation
 	def setPosition(self, x, y, z):
@@ -23,3 +23,14 @@ class Alien():
 		
 	def getZ(self):
 		return self.z
+		
+	def isOffScreen(self):
+		if self.z < -.8:
+			return True
+		else:
+			return False
+			
+	def delete(self):
+		self.alien.remove()
+			
+	#HITBOX:  X = +- .2, Y = 0, 2, Z = Z+-.2 

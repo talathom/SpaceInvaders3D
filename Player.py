@@ -49,3 +49,5 @@ class Player():
 		
 	def getZ(self):
 		return self.z
+		
+	#Hitbox: .05 = X, Z= .09
