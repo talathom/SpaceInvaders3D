@@ -6,8 +6,9 @@ class Alien():
 		self.y = 0
 		self.z = 0
 		self.theta = 0
-		self.alien = Model('model.dae')
+		self.alien = Model('alien.dae')
 	
+	# Move the alien around on x, y, z no rotation
 	def setPosition(self, x, y, z):
 		self.x = x
 		self.y = y

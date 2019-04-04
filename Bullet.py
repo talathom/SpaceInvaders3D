@@ -11,6 +11,9 @@ class Bullet():
 		self.vz = .02
 		self.bullet = Model('bullet.dae')
 	
+	def delete(self):
+		self.bullet.remove()
+		
 	def setPosition(self, x, y, z):
 		self.x = x
 		self.y = y

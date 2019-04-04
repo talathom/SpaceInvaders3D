@@ -77,6 +77,9 @@ class Model():
 	def getNode(self):
 		return self.node
 		
+	def remove(self):
+		self.node.remove()
+		
 	# set model's x,y,z, scale and rotation
 	def setOrientation(self,x,y,z,s,yrot,zrot,xrot):
 		self.x = x

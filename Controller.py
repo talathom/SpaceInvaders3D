@@ -1,6 +1,7 @@
 ﻿from Player import *
-from Alien import *
+from RammerAlien import *
 from Bullet import *
+import copy
 
 class Controller (viz.EventClass):
 
@@ -13,29 +14,40 @@ class Controller (viz.EventClass):
 		self.callback(viz.TIMER_EVENT, self.onTimer) # Callback for timers
 		self.callback(viz.KEYUP_EVENT, self.onKeyUp)
 		
+		#Creates memory for bullets and alien spawns
 		self.bulletlist = []
 		self.aliens = list()
+		
+		# Default rotation for camera
 		self.theta = 50
 		
+		#Booleans for keys pressed
 		self.leftUp = True
 		self.rightUp = True
 		self.Fire = False
+		self.start = False
 		
+		#Setup default camera view
 		self.view = viz.MainView
 		mat = viz.Matrix()
 		mat.postAxisAngle(1, 0, 0, self.theta)
 		mat.postTrans(0, 0, 0)
 		self.view.setMatrix(mat)
 		
+		#Spawn the player
 		self.playerShip = Player()
 		self.playerShip.setPosition(0, 0, -.6)
+		
+		# Start timers
 		self.starttimer(1, .05, viz.FOREVER)
 		self.starttimer(2, .05, viz.FOREVER)
 		self.starttimer(3, .001, viz.FOREVER)
+		self.starttimer(4, .5, viz.FOREVER) #Controls aliens
 		self.addCoordinateAxes()
 		self.spawnAliens()
 		
 	def spawnAliens(self):
+		# Spawns 3x6 aliens
 		x = -.6
 		for i in range(0, 6):
 			self.aliens.append(Alien())
@@ -51,8 +63,7 @@ class Controller (viz.EventClass):
 		for i in range(12, 18):
 			self.aliens.append(Alien())
 			self.aliens[i].setPosition(x, 0, .5)
-			x += .25
-		
+			x += .25		
 		
 	def onKeyDown(self, key):
 		if key == 'a' or key == viz.KEY_LEFT:
@@ -61,6 +72,7 @@ class Controller (viz.EventClass):
 		if key == 'd' or key == viz.KEY_RIGHT:
 			self.rightUp = False
 			
+		# Default Camera
 		if key == '1':
 			self.theta = 50
 			mat = viz.Matrix()
@@ -68,6 +80,7 @@ class Controller (viz.EventClass):
 			mat.postAxisAngle(1, 0, 0, self.theta)
 			self.view.setMatrix(mat)
 			
+		# Top Down View
 		if key == '2':
 			self.theta = 90
 			mat = viz.Matrix()
@@ -75,6 +88,7 @@ class Controller (viz.EventClass):
 			mat.postTrans(0, 2, 0)
 			self.view.setMatrix(mat)
 			
+		# Side View
 		if key == '3':
 			self.theta = 90
 			mat = viz.Matrix()
@@ -82,12 +96,16 @@ class Controller (viz.EventClass):
 			mat.postTrans(-1.5, 0, 0)
 			self.view.setMatrix(mat)
 			
+		# Side View
 		if key == '4':
 			self.theta = 270
 			mat = viz.Matrix()
 			mat.postAxisAngle(0, 1, 0, self.theta)
 			mat.postTrans(1.5, 0, 0)
 			self.view.setMatrix(mat)
+			
+		if key == '0':
+			self.start = True
 		
 		if key == " ":
 			b = Bullet()
@@ -95,6 +113,7 @@ class Controller (viz.EventClass):
 			self.bulletlist.append(b)
 			
 	def onKeyUp(self, key):
+		#Controls booleans for key presses, reactions are done by timers
 		if key == "a" or key == viz.KEY_LEFT:
 			self.leftUp = True
 		if key == "d" or key == viz.KEY_RIGHT:
@@ -103,7 +122,7 @@ class Controller (viz.EventClass):
 			self.fire = False
 			
 	def onTimer(self, num):
-		if num == 1:
+		if num == 1: # Moves the player left/right and controls the rotation of the ship
 			if not self.leftUp and self.playerShip.canGoLeft(-0.25):
 				self.playerShip.setPosition(self.playerShip.getX()-.025, self.playerShip.getY(), self.playerShip.getZ())
 				if self.playerShip.theta < 45 or self.playerShip.theta >= 315:
@@ -112,21 +131,26 @@ class Controller (viz.EventClass):
 				self.playerShip.setPosition(self.playerShip.getX()+.025, self.playerShip.getY(), self.playerShip.getZ())
 				if self.playerShip.theta > 315 and self.playerShip.theta <= 360 or self.playerShip.theta <= 45:
 					self.playerShip.rotate(351)
-		if num == 2:
+		if num == 2: #Controls passive rotation for if the player is not actively pressing buttons
 			if self.leftUp and self.rightUp:
 				if self.playerShip.theta <= 45 and self.playerShip.theta >= 0:
 					self.playerShip.rotate(351)
 				if self.playerShip.theta >= 315:
 					self.playerShip.rotate(9)
 		
-		for i in range (0, len(self.bulletlist)):
-			x = self.bulletlist[i].getX()
-			vx = self.bulletlist[i].getVX()
-			y = self.bulletlist[i].getY()
-			vy = self.bulletlist[i].getVY()
-			z = self.bulletlist[i].getZ()
-			vz = self.bulletlist[i].getVZ()
-			self.bulletlist[i].setPosition(x + vx, y + vy, z + vz)
+		if num == 3:
+			for bullet in self.bulletlist:
+				x = bullet.getX()
+				vx = bullet.getVX()
+				y = bullet.getY()
+				vy = bullet.getVY()
+				z = bullet.getZ()
+				vz = bullet.getVZ()
+				bullet.setPosition(x + vx, y + vy, z + vz)
+				if(bullet.getZ() > 2):
+					bullet.delete()
+					self.bulletlist.remove(bullet)
+					
 				
 	def addCoordinateAxes(self):
 		viz.startLayer(viz.LINES)

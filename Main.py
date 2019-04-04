@@ -10,7 +10,7 @@ viz.window.setName( "Space Invaders 3D" )
 window = viz.MainWindow
 # setup viewing volume
 
-# set background color of window to blue 
+# set background color of window to blue  
 viz.MainWindow.clearcolor( [0,0,0] ) 
 
 c = Controller()

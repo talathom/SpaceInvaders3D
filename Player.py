@@ -9,17 +9,18 @@ class Player():
 		self.theta = 0
 		self.playerShip = Model('playerShip.dae')
 		
-		# Deletes the ship
+		# TO DO: Deletes the ship
 	def delete(self):
-		pass
+		self.playerShip.remove()
 		
-		#Moves the ship to a new center at x, y
+		#Moves the ship to a new center at x, y, no rotation
 	def setPosition(self, x, y, z):
 		self.x = x
 		self.y = y
 		self.z = z
 		self.playerShip.setOrientation(self.x, self.y, self.z, 2, 180, self.theta,0)
 		
+		# Rotates the player on the Z axis
 	def rotate(self, zrot):
 		self.theta += zrot
 		if self.theta >= 360:
@@ -27,12 +28,13 @@ class Player():
 		self.playerShip.setZRotation(zrot)
 		self.playerShip.setOrientation(self.x, self.y, self.z, 2, 180, self.theta,0)
 		
+		# Boolean, Checks if the player can move right
 	def canGoRight(self, rateOfMovement):
 		if self.x  + rateOfMovement > 1:
 			return False
 		else: 
 			return True
-		
+		# Boolean, checks if the player cna move left
 	def canGoLeft(self, rateOfMovement):
 		if self.x  + rateOfMovement < -1:
 			return False
