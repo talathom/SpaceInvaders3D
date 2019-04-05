@@ -18,7 +18,7 @@ class Bullet():
 		self.x = x
 		self.y = y
 		self.z = z
-		self.bullet.setOrientation(self.x, self.y, self.z, .005, 45, self.theta,90)
+		self.bullet.setOrientation(self.x, self.y, self.z, .005, 45, 0,theta)
 		
 	def getX(self):
 		return self.x
@@ -42,5 +42,8 @@ class Bullet():
 		self.vx = vx
 		self.vy = vy
 		self.vz = vz
+		
+	def setTheta(self,ang):
+		self.theta += ang;
 		
 	

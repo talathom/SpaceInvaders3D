@@ -194,7 +194,7 @@ class Controller (viz.EventClass):
 				vy = bullet.getVY()
 				z = bullet.getZ()
 				vz = bullet.getVZ()
-				bullet.setPosition(x + vx, y + vy, z + vz)
+				bullet.setPosition(x - vx, y - vy, z - vz)
 					
 		if num == 4 and not self.pause:
 			# Move aliens
