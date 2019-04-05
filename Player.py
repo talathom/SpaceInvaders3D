@@ -49,5 +49,8 @@ class Player():
 		
 	def getZ(self):
 		return self.z
+	
+	def delete(self):
+		self.playerShip.remove()
 		
 	#Hitbox: .05 = X, Z= .09

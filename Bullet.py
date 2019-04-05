@@ -5,7 +5,7 @@ class Bullet():
 		self.x = 0
 		self.y = 0
 		self.z = 0
-		self.theta = 0
+		self.theta = 90
 		self.vx = 0
 		self.vy = 0
 		self.vz = .02
@@ -18,7 +18,7 @@ class Bullet():
 		self.x = x
 		self.y = y
 		self.z = z
-		self.bullet.setOrientation(self.x, self.y, self.z, .005, 45, 0,theta)
+		self.bullet.setOrientation(self.x, self.y, self.z, .005, 45, 0,self.theta)
 		
 	def getX(self):
 		return self.x

@@ -43,7 +43,9 @@ class Controller (viz.EventClass):
 		self.starttimer(1, .05, viz.FOREVER)
 		self.starttimer(2, .05, viz.FOREVER)
 		self.starttimer(3, .001, viz.FOREVER)
-		self.starttimer(5, .3, viz.FOREVER)
+		self.starttimer(4, .3, viz.FOREVER)
+		self.starttimer(5, .5, viz.FOREVER)
+		self.starttimer(6, .01, viz.FOREVER)
 		self.addCoordinateAxes()
 		self.spawnAliens()
 		
@@ -195,7 +197,16 @@ class Controller (viz.EventClass):
 				z = bullet.getZ()
 				vz = bullet.getVZ()
 				bullet.setPosition(x - vx, y - vy, z - vz)
-					
+				
+				if(bullet.getZ() < -.8):
+					bullet.delete()
+					self.alienbullets.remove(bullet)
+				if bullet.getX() > self.playerShip.getX()-.1 and bullet.getX() < self.playerShip.getX()+.1 and bullet.getZ() > self.playerShip.getZ()-.1 and bullet.getZ() < self.playerShip.getZ()+.1:
+					bullet.delete()
+					self.alienbullets.remove(bullet)
+					self.playerShip.delete()
+		
+		
 		if num == 4 and not self.pause:
 			# Move aliens
 			for alien in self.aliens:
@@ -205,6 +216,11 @@ class Controller (viz.EventClass):
 						self.playerShip.delete()
 					if alien.isOffScreen():
 						alien.setPosition(alien.getX(), alien.getY(), 1)
+					
+		
+		if num == 5:
+			for alien in self.aliens:
+				if alien != None:
 					if alien.getColor() == 'red': #Only red ships can fire
 						index = self.aliens.index(alien) #Get the index of the current ship in our list
 						#Checks for whether a ship exists in the two spots in front, False = No Ship, True = Ship Exists
@@ -218,13 +234,14 @@ class Controller (viz.EventClass):
 						elif index < 12:
 							if self.aliens[index+6] != None:
 								checkOne = True
-							# FIRES ALIEN BULLETS, THESE CHECKS ARE REQUIRED TO ALLOW A SHIP TO FIRE
+									# FIRES ALIEN BULLETS, THESE CHECKS ARE REQUIRED TO ALLOW A SHIP TO FIRE
 						if not checkOne and not checkTwo and self.playerShip.getX() <= alien.getX()+.1 and self.playerShip.getX() >= alien.getX()-.1:
 							b = Bullet()
+							b.setTheta(180)
 							b.setPosition(alien.getX(), alien.getY(), alien.getZ())
 							self.alienbullets.append(b)
-		
-		if num == 5:
+			
+		if num == 6:
 			self.Fire = True
 					
 				
