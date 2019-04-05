@@ -141,7 +141,7 @@ class Controller (viz.EventClass):
 			self.view.setMatrix(mat)
 		
 		if key == " " and self.Fire:
-			b = Bullet()
+			b = Bullet('greenBullet.dae')
 			b.setPosition(self.playerShip.getX()-.02,self.playerShip.getY()+.02,self.playerShip.getZ())
 			self.bulletlist.append(b)
 			self.Fire = False
@@ -257,7 +257,7 @@ class Controller (viz.EventClass):
 								checkOne = True
 									# FIRES ALIEN BULLETS, THESE CHECKS ARE REQUIRED TO ALLOW A SHIP TO FIRE
 						if not checkOne and not checkTwo and self.playerShip.getX() <= alien.getX()+.1 and self.playerShip.getX() >= alien.getX()-.1 and not self.pause:
-							b = Bullet()
+							b = Bullet('redBullet.dae')
 							b.setTheta(180)
 							b.setPosition(alien.getX(), alien.getY(), alien.getZ())
 							self.alienbullets.append(b)

@@ -1,7 +1,7 @@
 ﻿from Model import *
 
 class Bullet():
-	def __init__(self):
+	def __init__(self, model):
 		self.x = 0
 		self.y = 0
 		self.z = 0
@@ -9,7 +9,7 @@ class Bullet():
 		self.vx = 0
 		self.vy = 0
 		self.vz = .02
-		self.bullet = Model('bullet.dae')
+		self.bullet = Model(model)
 	
 	def delete(self):
 		self.bullet.remove()
