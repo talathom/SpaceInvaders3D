@@ -8,6 +8,7 @@ class Alien():
 		self.theta = 0
 		self.color = color
 		self.alien = Model(model)
+		self.canFire = True
 	
 	# Move the alien around on x, y, z no rotation
 	def setPosition(self, x, y, z):
@@ -36,5 +37,16 @@ class Alien():
 		
 	def getColor(self):
 		return self.color
+		
+	def canFire(self):
+		return self.canFire
+		
+	def fire(self):
+		self.canFire = False
+	
+	def reload(self):
+		self.canFire = True
+		
+	
 			
 	#HITBOX:  X = +- .2, Y = 0, 2, Z = Z+-.2 
