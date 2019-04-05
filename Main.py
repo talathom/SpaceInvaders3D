@@ -10,6 +10,11 @@ viz.window.setName( "Space Invaders 3D" )
 window = viz.MainWindow
 # setup viewing volume
 
+sky = vizshape.addSphere(1000, flipFaces=True)
+spacetexture = viz.add('space.jpg')
+sky.texture(spacetexture)
+
+
 # set background color of window to blue  
 viz.MainWindow.clearcolor( [0,0,0] ) 
 

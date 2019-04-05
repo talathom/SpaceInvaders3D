@@ -1,11 +1,12 @@
 ﻿from Model import *
 
 class Alien():
-	def __init__(self, model, color):
+	def __init__(self, model, color, hp=1):
 		self.x = 0
 		self.y = 0
 		self.z = 0
 		self.theta = 0
+		self.hp = hp
 		self.color = color
 		self.alien = Model(model)
 		self.canFire = True
@@ -47,6 +48,11 @@ class Alien():
 	def reload(self):
 		self.canFire = True
 		
+	def getHP(self):
+		return self.hp
+		
+	def damage(self):
+		self.hp = self.hp - 1
 	
 			
 	#HITBOX:  X = +- .2, Y = 0, 2, Z = Z+-.2 

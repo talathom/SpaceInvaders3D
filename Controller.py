@@ -2,6 +2,7 @@
 from Alien import *
 from Bullet import *
 import random
+import math
 
 class Controller (viz.EventClass):
 
@@ -39,11 +40,14 @@ class Controller (viz.EventClass):
 		self.playerShip = Player()
 		self.playerShip.setPosition(0, 0, -.6)
 		
+		self.power = 8
+		self.speed = 1/math.log(self.power, 2.0)
+		
 		# Start timers
 		self.starttimer(1, .05, viz.FOREVER)
 		self.starttimer(2, .05, viz.FOREVER)
 		self.starttimer(3, .001, viz.FOREVER)
-		self.starttimer(4, .3, viz.FOREVER)
+		self.starttimer(4, self.speed, viz.FOREVER)
 		self.starttimer(5, .5, viz.FOREVER)
 		self.starttimer(6, .01, viz.FOREVER)
 		self.addCoordinateAxes()
@@ -53,34 +57,41 @@ class Controller (viz.EventClass):
 		# Spawns 3x6 aliens
 		bluemodel = 'blueAlien.dae'
 		redmodel = 'redAlien.dae'
+		purplemodel = 'redalien.dae'
 		
 		x = -.6
 		for i in range(0, 6):
-			num = random.randint(0, 1)
+			num = random.randint(0, 2)
 			if num == 0:
 				self.aliens[i] = Alien(bluemodel, 'blue')
-			else:
+			elif num == 1:
 				self.aliens[i] = Alien(redmodel, 'red')
+			elif num == 2:
+				self.aliens[i] = Alien(purplemodel, 'purple', hp=3)
 			self.aliens[i].setPosition(x, 0, 1)
 			x += .25
 		
 		x = -.6
 		for i in range(6, 12):
-			num = random.randint(0, 1)
+			num = random.randint(0, 2)
 			if num == 0:
 				self.aliens[i] = Alien(bluemodel, 'blue')
-			else:
+			elif num == 1:
 				self.aliens[i] = Alien(redmodel, 'red')
+			elif num == 2:
+				self.aliens[i] = Alien(purplemodel, 'purple', hp=3)
 			self.aliens[i].setPosition(x, 0, .75)
 			x += .25
 			
 		x = -.6
 		for i in range(12, 18):
-			num = random.randint(0, 1)
+			num = random.randint(0, 2)
 			if num == 0:
 				self.aliens[i] = Alien(bluemodel, 'blue')
-			else:
+			elif num == 1:
 				self.aliens[i] = Alien(redmodel, 'red')
+			elif num == 2:
+				self.aliens[i] = Alien(purplemodel, 'purple', hp=3)
 			self.aliens[i].setPosition(x, 0, .5)
 			x += .25
 		
@@ -179,14 +190,27 @@ class Controller (viz.EventClass):
 					bullet.delete()
 					self.bulletlist.remove(bullet)
 				# Check bullet to alien collison
+				deadaliens = 0
 				for alien in self.aliens:
 					if alien != None:
 						if bullet.getX() > alien.getX()-.1 and bullet.getX() < alien.getX()+.1 and bullet.getZ() > alien.getZ()-.1 and bullet.getZ() < alien.getZ()+.1:
 							bullet.delete()
 							self.bulletlist.remove(bullet)
-							alien.delete()
-							deadalien = self.aliens.index(alien)
-							self.aliens[deadalien] = None
+							alien.damage()
+							if alien.getHP() == 0:
+								alien.delete()
+								deadalien = self.aliens.index(alien)
+								self.aliens[deadalien] = None
+								deadaliens += 1
+					else:
+						deadaliens += 1
+				if len(self.aliens) == deadaliens:
+					self.power = self.power*2
+					self.speed = 1/math.log(self.power, 2.0)
+					viz.killtimer(4)
+					self.starttimer(4, self.speed, viz.FOREVER)
+					self.spawnAliens()
+							
 							
 			# TRANSLATE ALIEN BULLET
 			for bullet in self.alienbullets:
@@ -235,7 +259,7 @@ class Controller (viz.EventClass):
 							if self.aliens[index+6] != None:
 								checkOne = True
 									# FIRES ALIEN BULLETS, THESE CHECKS ARE REQUIRED TO ALLOW A SHIP TO FIRE
-						if not checkOne and not checkTwo and self.playerShip.getX() <= alien.getX()+.1 and self.playerShip.getX() >= alien.getX()-.1:
+						if not checkOne and not checkTwo and self.playerShip.getX() <= alien.getX()+.1 and self.playerShip.getX() >= alien.getX()-.1 and not self.pause:
 							b = Bullet()
 							b.setTheta(180)
 							b.setPosition(alien.getX(), alien.getY(), alien.getZ())
