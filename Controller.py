@@ -40,8 +40,8 @@ class Controller (viz.EventClass):
 		self.playerShip = Player()
 		self.playerShip.setPosition(0, 0, -.6)
 		
-		self.power = 8
-		self.speed = 1/math.log(self.power, 2.0)
+		self.power = 3
+		self.speed = 1/self.power
 		
 		# Start timers
 		self.starttimer(1, .05, viz.FOREVER)
@@ -49,7 +49,7 @@ class Controller (viz.EventClass):
 		self.starttimer(3, .001, viz.FOREVER)
 		self.starttimer(4, self.speed, viz.FOREVER)
 		self.starttimer(5, .5, viz.FOREVER)
-		self.starttimer(6, .01, viz.FOREVER)
+		self.starttimer(6, .3, viz.FOREVER)
 		self.addCoordinateAxes()
 		self.spawnAliens()
 		
@@ -57,7 +57,7 @@ class Controller (viz.EventClass):
 		# Spawns 3x6 aliens
 		bluemodel = 'blueAlien.dae'
 		redmodel = 'redAlien.dae'
-		purplemodel = 'redalien.dae'
+		purplemodel = 'tankAlien.dae'
 		
 		x = -.6
 		for i in range(0, 6):
@@ -139,9 +139,6 @@ class Controller (viz.EventClass):
 			mat.postAxisAngle(0, 1, 0, self.theta)
 			mat.postTrans(1.5, 0, 0)
 			self.view.setMatrix(mat)
-			
-		if key == '0':
-			self.starttimer(4, .0005, viz.FOREVER)
 		
 		if key == " " and self.Fire:
 			b = Bullet()
@@ -205,8 +202,8 @@ class Controller (viz.EventClass):
 					else:
 						deadaliens += 1
 				if len(self.aliens) == deadaliens:
-					self.power = self.power*2
-					self.speed = 1/math.log(self.power, 2.0)
+					self.power += 1
+					self.speed = 1/self.power
 					viz.killtimer(4)
 					self.starttimer(4, self.speed, viz.FOREVER)
 					self.spawnAliens()
