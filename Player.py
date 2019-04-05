@@ -9,7 +9,7 @@ class Player():
 		self.theta = 0
 		self.playerShip = Model('playerShip.dae')
 		
-		# TO DO: Deletes the ship
+		# Deletes the ship
 	def delete(self):
 		self.playerShip.remove()
 		

@@ -1,7 +1,7 @@
 ﻿from Player import *
-from RammerAlien import *
+from Alien import *
 from Bullet import *
-import copy
+import random
 
 class Controller (viz.EventClass):
 
@@ -16,8 +16,8 @@ class Controller (viz.EventClass):
 		
 		#Creates memory for bullets and alien spawns
 		self.bulletlist = []
-		self.aliens = list()
-		
+		self.aliens = [None for x in range(0, 18)]
+		self.alienbullets = list()
 		# Default rotation for camera
 		self.theta = 50
 		
@@ -49,25 +49,38 @@ class Controller (viz.EventClass):
 		
 	def spawnAliens(self):
 		# Spawns 3x6 aliens
-		model = 'blueAlien.dae'
+		bluemodel = 'blueAlien.dae'
+		redmodel = 'redAlien.dae'
+		
 		x = -.6
 		for i in range(0, 6):
-			self.aliens.append(Alien(model))
+			num = random.randint(0, 1)
+			if num == 0:
+				self.aliens[i] = Alien(bluemodel, 'blue')
+			else:
+				self.aliens[i] = Alien(redmodel, 'red')
 			self.aliens[i].setPosition(x, 0, 1)
 			x += .25
 		
 		x = -.6
 		for i in range(6, 12):
-			self.aliens.append(Alien(model))
+			num = random.randint(0, 1)
+			if num == 0:
+				self.aliens[i] = Alien(bluemodel, 'blue')
+			else:
+				self.aliens[i] = Alien(redmodel, 'red')
 			self.aliens[i].setPosition(x, 0, .75)
 			x += .25
 			
-		model = 'redAlien.dae'
 		x = -.6
 		for i in range(12, 18):
-			self.aliens.append(Alien(model))
+			num = random.randint(0, 1)
+			if num == 0:
+				self.aliens[i] = Alien(bluemodel, 'blue')
+			else:
+				self.aliens[i] = Alien(redmodel, 'red')
 			self.aliens[i].setPosition(x, 0, .5)
-			x += .25		
+			x += .25
 		
 	def onKeyDown(self, key):
 		if key == 'a' or key == viz.KEY_LEFT:
@@ -115,7 +128,7 @@ class Controller (viz.EventClass):
 			self.view.setMatrix(mat)
 			
 		if key == '0':
-			self.starttimer(4, .005, viz.FOREVER)
+			self.starttimer(4, .0005, viz.FOREVER)
 		
 		if key == " " and self.Fire:
 			b = Bullet()
@@ -165,20 +178,51 @@ class Controller (viz.EventClass):
 					self.bulletlist.remove(bullet)
 				# Check bullet to alien collison
 				for alien in self.aliens:
-					if bullet.getX() > alien.getX()-.1 and bullet.getX() < alien.getX()+.1 and bullet.getZ() > alien.getZ()-.1 and bullet.getZ() < alien.getZ()+.1:
-						bullet.delete()
-						self.bulletlist.remove(bullet)
-						alien.delete()
-						self.aliens.remove(alien)
+					if alien != None:
+						if bullet.getX() > alien.getX()-.1 and bullet.getX() < alien.getX()+.1 and bullet.getZ() > alien.getZ()-.1 and bullet.getZ() < alien.getZ()+.1:
+							bullet.delete()
+							self.bulletlist.remove(bullet)
+							alien.delete()
+							deadalien = self.aliens.index(alien)
+							self.aliens[deadalien] = None
+							
+			# TRANSLATE ALIEN BULLET
+			for bullet in self.alienbullets:
+				x = bullet.getX()
+				vx = bullet.getVX()
+				y = bullet.getY()
+				vy = bullet.getVY()
+				z = bullet.getZ()
+				vz = bullet.getVZ()
+				bullet.setPosition(x + vx, y + vy, z + vz)
 					
 		if num == 4 and not self.pause:
 			# Move aliens
 			for alien in self.aliens:
-				alien.setPosition(alien.getX(), alien.getY(), alien.getZ() - .001)
-				if self.playerShip.getX()+.04 > alien.getX()-.1 and self.playerShip.getX()-.04 < alien.getX()+.1 and self.playerShip.getZ()+.06 > alien.getZ()-.1 and self.playerShip.getZ()-.06 < alien.getZ()+.1:
-					self.playerShip.delete()
-				if alien.isOffScreen():
-					alien.setPosition(alien.getX(), alien.getY(), 1)
+				if alien != None:
+					alien.setPosition(alien.getX(), alien.getY(), alien.getZ() - .001)
+					if self.playerShip.getX()+.04 > alien.getX()-.1 and self.playerShip.getX()-.04 < alien.getX()+.1 and self.playerShip.getZ()+.06 > alien.getZ()-.1 and self.playerShip.getZ()-.06 < alien.getZ()+.1:
+						self.playerShip.delete()
+					if alien.isOffScreen():
+						alien.setPosition(alien.getX(), alien.getY(), 1)
+					if alien.getColor() == 'red': #Only red ships can fire
+						index = self.aliens.index(alien) #Get the index of the current ship in our list
+						#Checks for whether a ship exists in the two spots in front, False = No Ship, True = Ship Exists
+						checkOne = False
+						checkTwo = False
+						if index < 6:
+							if self.aliens[index+6] != None:
+								checkOne = True
+							if self.aliens[index+12] != None:
+								checkTwo = True
+						elif index < 12:
+							if self.aliens[index+6] != None:
+								checkOne = True
+							# FIRES ALIEN BULLETS, THESE CHECKS ARE REQUIRED TO ALLOW A SHIP TO FIRE
+						if not checkOne and not checkTwo and self.playerShip.getX() <= alien.getX()+.1 and self.playerShip.getX() >= alien.getX()-.1:
+							b = Bullet()
+							b.setPosition(alien.getX(), alien.getY(), alien.getZ())
+							self.alienbullets.append(b)
 		
 		if num == 5:
 			self.Fire = True
