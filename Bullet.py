@@ -1,7 +1,7 @@
 ﻿from Model import *
 
 class Bullet():
-	def __init__(self, model):
+	def __init__(self, modelLabel=None, model=None):
 		self.x = 0
 		self.y = 0
 		self.z = 0
@@ -9,7 +9,10 @@ class Bullet():
 		self.vx = 0
 		self.vy = 0
 		self.vz = .02
-		self.bullet = Model(model)
+		if modelLabel != None:
+			self.bullet = Model(filename=modelLabel)
+		elif model != None:
+			self.bullet = Model(node=model)
 	
 	def delete(self):
 		self.bullet.remove()
@@ -45,5 +48,8 @@ class Bullet():
 		
 	def setTheta(self,ang):
 		self.theta += ang;
+		
+	def clone(self):
+		return self.bullet.clone()
 		
 	

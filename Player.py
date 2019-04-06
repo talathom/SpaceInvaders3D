@@ -7,7 +7,7 @@ class Player():
 		self.y = 0
 		self.z = 0
 		self.theta = 0
-		self.playerShip = Model('playerShip.dae')
+		self.playerShip = Model(filename='playerShip.dae')
 		
 		# Deletes the ship
 	def delete(self):

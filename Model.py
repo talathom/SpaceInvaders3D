@@ -11,9 +11,12 @@ import math
 class Model():
 
 	# Constructor 
-	def __init__(self, filename):
-		# read model data from file and add to scene graph 
-		self.node = viz.add(filename)
+	def __init__(self, filename=None, node=None):
+		# read model data from file and add to scene graph
+		if node == None and filename != None:
+			self.node = viz.add(filename)
+		elif node != None and filename == None:
+			self.node = node
 		# model's location in world
 		self.x = 0
 		self.y = 0
@@ -100,3 +103,6 @@ class Model():
 		mat.postAxisAngle(1,0,0, self.xrot)
 		mat.postTrans(self.x,self.y,self.z)
 		self.node.setMatrix( mat )
+		
+	def clone(self):
+		return self.node.clone()

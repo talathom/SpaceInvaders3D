@@ -51,23 +51,33 @@ class Controller (viz.EventClass):
 		self.starttimer(5, .5, viz.FOREVER)
 		self.starttimer(6, .3, viz.FOREVER)
 		self.addCoordinateAxes()
+		
+		#Initialize these models far off screen so they can be copied, thus these models only load once
+		self.firstRed = Alien('red', modelLabel='redAlien.dae')
+		self.firstRed.setPosition(0, 2000, 0)
+		self.firstBlue = Alien('blue', modelLabel='blueAlien.dae')
+		self.firstBlue.setPosition(0, 2000, 0)
+		self.firstPurple = Alien('purple', modelLabel='tankAlien.dae')
+		self.firstPurple.setPosition(0, 2000, 0)
+		self.redbullet = Bullet(modelLabel='redBullet.dae')
+		self.redbullet.setPosition(0, 2000, 0)
+		self.greenbullet = Bullet(modelLabel='greenBullet.dae')
+		self.greenbullet.setPosition(0, 2000, 0)
+		
 		self.spawnAliens()
 		
 	def spawnAliens(self):
 		# Spawns 3x6 aliens
-		bluemodel = 'blueAlien.dae'
-		redmodel = 'redAlien.dae'
-		purplemodel = 'tankAlien.dae'
 		
 		x = -.6
 		for i in range(0, 6):
 			num = random.randint(0, 2)
 			if num == 0:
-				self.aliens[i] = Alien(bluemodel, 'blue')
+				self.aliens[i] = Alien('blue', model=self.firstBlue.clone())
 			elif num == 1:
-				self.aliens[i] = Alien(redmodel, 'red')
+				self.aliens[i] = Alien('red', model=self.firstRed.clone())
 			elif num == 2:
-				self.aliens[i] = Alien(purplemodel, 'purple', hp=3)
+				self.aliens[i] = Alien('purple', model=self.firstPurple.clone(), hp=3)
 			self.aliens[i].setPosition(x, 0, 1)
 			x += .25
 		
@@ -75,11 +85,11 @@ class Controller (viz.EventClass):
 		for i in range(6, 12):
 			num = random.randint(0, 2)
 			if num == 0:
-				self.aliens[i] = Alien(bluemodel, 'blue')
+				self.aliens[i] = Alien('blue', model=self.firstBlue.clone())
 			elif num == 1:
-				self.aliens[i] = Alien(redmodel, 'red')
+				self.aliens[i] = Alien('red', model=self.firstRed.clone())
 			elif num == 2:
-				self.aliens[i] = Alien(purplemodel, 'purple', hp=3)
+				self.aliens[i] = Alien('purple', model=self.firstPurple.clone(), hp=3)
 			self.aliens[i].setPosition(x, 0, .75)
 			x += .25
 			
@@ -87,11 +97,11 @@ class Controller (viz.EventClass):
 		for i in range(12, 18):
 			num = random.randint(0, 2)
 			if num == 0:
-				self.aliens[i] = Alien(bluemodel, 'blue')
+				self.aliens[i] = Alien('blue', model=self.firstBlue.clone())
 			elif num == 1:
-				self.aliens[i] = Alien(redmodel, 'red')
+				self.aliens[i] = Alien('red', model=self.firstRed.clone())
 			elif num == 2:
-				self.aliens[i] = Alien(purplemodel, 'purple', hp=3)
+				self.aliens[i] = Alien('purple', model=self.firstPurple.clone(), hp=3)
 			self.aliens[i].setPosition(x, 0, .5)
 			x += .25
 		
@@ -141,7 +151,7 @@ class Controller (viz.EventClass):
 			self.view.setMatrix(mat)
 		
 		if key == " " and self.Fire:
-			b = Bullet('greenBullet.dae')
+			b = Bullet(model=self.greenbullet.clone())
 			b.setPosition(self.playerShip.getX()-.02,self.playerShip.getY()+.02,self.playerShip.getZ())
 			self.bulletlist.append(b)
 			self.Fire = False
@@ -257,7 +267,7 @@ class Controller (viz.EventClass):
 								checkOne = True
 									# FIRES ALIEN BULLETS, THESE CHECKS ARE REQUIRED TO ALLOW A SHIP TO FIRE
 						if not checkOne and not checkTwo and self.playerShip.getX() <= alien.getX()+.1 and self.playerShip.getX() >= alien.getX()-.1 and not self.pause:
-							b = Bullet('redBullet.dae')
+							b = Bullet(model=self.redbullet.clone())
 							b.setTheta(180)
 							b.setPosition(alien.getX(), alien.getY(), alien.getZ())
 							self.alienbullets.append(b)

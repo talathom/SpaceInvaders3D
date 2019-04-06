@@ -1,15 +1,19 @@
 ﻿from Model import *
 
 class Alien():
-	def __init__(self, model, color, hp=1):
+	def __init__(self, color, modelLabel=None, model=None, hp=1):
 		self.x = 0
 		self.y = 0
 		self.z = 0
 		self.theta = 0
 		self.hp = hp
 		self.color = color
-		self.alien = Model(model)
+		if modelLabel != None:
+			self.alien = Model(filename=modelLabel)
+		elif model != None:
+			self.alien = Model(node=model)
 		self.canFire = True
+		
 	
 	# Move the alien around on x, y, z no rotation
 	def setPosition(self, x, y, z):
@@ -53,6 +57,9 @@ class Alien():
 		
 	def damage(self):
 		self.hp = self.hp - 1
+		
+	def clone(self):
+		return self.alien.clone()
 	
 			
 	#HITBOX:  X = +- .2, Y = 0, 2, Z = Z+-.2 
