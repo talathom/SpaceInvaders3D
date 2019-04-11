@@ -2,11 +2,12 @@
 from Model import *
 
 class Player():
-	def __init__(self):
+	def __init__(self, hp=1):
 		self.x = 0
 		self.y = 0
 		self.z = 0
 		self.theta = 0
+		self.hp = hp
 		self.playerShip = Model(filename='playerShip.dae')
 		
 		# Deletes the ship
@@ -52,5 +53,14 @@ class Player():
 	
 	def delete(self):
 		self.playerShip.remove()
+		
+	def getHP(self):
+		return self.hp
+		
+	def damage(self, damage):
+		self.hp -= damage
+		
+	def powerUp(self):
+		self.hp += 1
 		
 	#Hitbox: .05 = X, Z= .09

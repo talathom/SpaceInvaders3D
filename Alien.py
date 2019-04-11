@@ -8,6 +8,7 @@ class Alien():
 		self.theta = 0
 		self.hp = hp
 		self.color = color
+		self.scale = .0025
 		if modelLabel != None:
 			self.alien = Model(filename=modelLabel)
 		elif model != None:
@@ -16,11 +17,12 @@ class Alien():
 		
 	
 	# Move the alien around on x, y, z no rotation
-	def setPosition(self, x, y, z):
+	def setPosition(self, x, y, z, scale=.0025):
 		self.x = x
 		self.y = y
 		self.z = z
-		self.alien.setOrientation(self.x, self.y, self.z, .0025, 180, self.theta,0)
+		self.scale = scale
+		self.alien.setOrientation(self.x, self.y, self.z, self.scale, 180, self.theta,0)
 		
 	def getX(self):
 		return self.x
@@ -60,6 +62,9 @@ class Alien():
 		
 	def clone(self):
 		return self.alien.clone()
+		
+	def getScale(self):
+		return self.scale
 	
 			
 	#HITBOX:  X = +- .2, Y = 0, 2, Z = Z+-.2 

@@ -29,6 +29,8 @@ class Controller (viz.EventClass):
 		self.start = False
 		self.pause = False
 		
+		self.playerSpeed = .05
+		
 		#Setup default camera view
 		self.view = viz.MainView
 		mat = viz.Matrix()
@@ -50,7 +52,6 @@ class Controller (viz.EventClass):
 		self.starttimer(4, self.speed, viz.FOREVER)
 		self.starttimer(5, .5, viz.FOREVER)
 		self.starttimer(6, .3, viz.FOREVER)
-		self.addCoordinateAxes()
 		
 		#Initialize these models far off screen so they can be copied, thus these models only load once
 		self.firstRed = Alien('red', modelLabel='redAlien.dae')
@@ -63,47 +64,68 @@ class Controller (viz.EventClass):
 		self.redbullet.setPosition(0, 2000, 0)
 		self.greenbullet = Bullet(modelLabel='greenBullet.dae')
 		self.greenbullet.setPosition(0, 2000, 0)
+		self.firstOrange = Alien('orange', modelLabel = 'powerupAlien.dae')
+		self.firstOrange.setPosition(0, 2000, 0)
+		self.firstYellow = Alien('yellow', modelLabel = 'yellowAlien.dae')
+		self.firstYellow.setPosition(0, 2000, 0)
+		
+		self.boss = None
+		self.bossRight = False
+		self.bossLeft = True
 		
 		self.spawnAliens()
 		
 	def spawnAliens(self):
 		# Spawns 3x6 aliens
 		
-		x = -.6
-		for i in range(0, 6):
-			num = random.randint(0, 2)
-			if num == 0:
-				self.aliens[i] = Alien('blue', model=self.firstBlue.clone())
-			elif num == 1:
-				self.aliens[i] = Alien('red', model=self.firstRed.clone())
-			elif num == 2:
-				self.aliens[i] = Alien('purple', model=self.firstPurple.clone(), hp=3)
-			self.aliens[i].setPosition(x, 0, 1)
-			x += .25
-		
-		x = -.6
-		for i in range(6, 12):
-			num = random.randint(0, 2)
-			if num == 0:
-				self.aliens[i] = Alien('blue', model=self.firstBlue.clone())
-			elif num == 1:
-				self.aliens[i] = Alien('red', model=self.firstRed.clone())
-			elif num == 2:
-				self.aliens[i] = Alien('purple', model=self.firstPurple.clone(), hp=3)
-			self.aliens[i].setPosition(x, 0, .75)
-			x += .25
+		print("LEVEL: "+ str(self.power))
+		if self.power % 6 == 0:
+			self.boss = Alien('yellow', model=self.firstYellow.clone(), hp=self.power*6)
+			self.boss.setPosition(0, 0, 1, scale=.0025*3)
+			self.speed = 1/(self.power/2)
+		else:
+			x = -.6
+			for i in range(0, 6):
+				num = random.randint(0, 3)
+				if num == 0:
+					self.aliens[i] = Alien('blue', model=self.firstBlue.clone(), hp=3)
+				elif num == 1:
+					self.aliens[i] = Alien('red', model=self.firstRed.clone())
+				elif num == 2:
+					self.aliens[i] = Alien('purple', model=self.firstPurple.clone(), hp=3)
+				elif num == 3:
+					self.aliens[i] = Alien('orange', model=self.firstOrange.clone(), hp=2)
+				self.aliens[i].setPosition(x, 0, 1)
+				x += .25
 			
-		x = -.6
-		for i in range(12, 18):
-			num = random.randint(0, 2)
-			if num == 0:
-				self.aliens[i] = Alien('blue', model=self.firstBlue.clone())
-			elif num == 1:
-				self.aliens[i] = Alien('red', model=self.firstRed.clone())
-			elif num == 2:
-				self.aliens[i] = Alien('purple', model=self.firstPurple.clone(), hp=3)
-			self.aliens[i].setPosition(x, 0, .5)
-			x += .25
+			x = -.6
+			for i in range(6, 12):
+				num = random.randint(0, 3)
+				if num == 0:
+					self.aliens[i] = Alien('blue', model=self.firstBlue.clone(), hp=3)
+				elif num == 1:
+					self.aliens[i] = Alien('red', model=self.firstRed.clone())
+				elif num == 2:
+					self.aliens[i] = Alien('purple', model=self.firstPurple.clone(), hp=3)
+				elif num == 3:
+					self.aliens[i] = Alien('orange', model=self.firstOrange.clone(), hp=2)
+				self.aliens[i].setPosition(x, 0, .75)
+				x += .25
+				
+			x = -.6
+			for i in range(12, 18):
+				num = random.randint(0, 3)
+				if num == 0:
+					self.aliens[i] = Alien('blue', model=self.firstBlue.clone(), hp=3)
+				elif num == 1:
+					self.aliens[i] = Alien('red', model=self.firstRed.clone())
+				elif num == 2:
+					self.aliens[i] = Alien('purple', model=self.firstPurple.clone(), hp=3)
+				elif num == 3:
+					self.aliens[i] = Alien('orange', model=self.firstOrange.clone(), hp=2)
+				self.aliens[i].setPosition(x, 0, .5)
+				x += .25
+			
 		
 	def onKeyDown(self, key):
 		if key == 'a' or key == viz.KEY_LEFT:
@@ -168,11 +190,11 @@ class Controller (viz.EventClass):
 	def onTimer(self, num):
 		if num == 1: # Moves the player left/right and controls the rotation of the ship
 			if not self.leftUp and self.playerShip.canGoLeft(-0.25):
-				self.playerShip.setPosition(self.playerShip.getX()-.025, self.playerShip.getY(), self.playerShip.getZ())
+				self.playerShip.setPosition(self.playerShip.getX()-self.playerSpeed, self.playerShip.getY(), self.playerShip.getZ())
 				if self.playerShip.theta < 45 or self.playerShip.theta >= 315:
 					self.playerShip.rotate(9)
 			if not self.rightUp and self.playerShip.canGoRight(0.25):
-				self.playerShip.setPosition(self.playerShip.getX()+.025, self.playerShip.getY(), self.playerShip.getZ())
+				self.playerShip.setPosition(self.playerShip.getX()+self.playerSpeed, self.playerShip.getY(), self.playerShip.getZ())
 				if self.playerShip.theta > 315 and self.playerShip.theta <= 360 or self.playerShip.theta <= 45:
 					self.playerShip.rotate(351)
 		if num == 2: #Controls passive rotation for if the player is not actively pressing buttons
@@ -204,14 +226,26 @@ class Controller (viz.EventClass):
 							bullet.delete()
 							self.bulletlist.remove(bullet)
 							alien.damage()
-							if alien.getHP() == 0:
+							if alien.getHP() <= 0:
 								alien.delete()
 								deadalien = self.aliens.index(alien)
 								self.aliens[deadalien] = None
 								deadaliens += 1
+								if alien.getColor() == 'orange':
+									self.playerShip.powerUp()
+									print(self.playerShip.getHP())
 					else:
 						deadaliens += 1
-				if len(self.aliens) == deadaliens:
+				if self.boss != None:
+					if bullet.getX() > self.boss.getX()-.3 and bullet.getX() < self.boss.getX()+.3 and bullet.getZ() > self.boss.getZ()-.3 and bullet.getZ() < self.boss.getZ()+.3:
+							bullet.delete()
+							self.bulletlist.remove(bullet)
+							self.boss.damage()
+							if self.boss.getHP() <= 0:
+								self.boss.delete()
+								self.boss = None
+				
+				if len(self.aliens) == deadaliens and self.boss == None:
 					self.power += 1
 					self.speed = 1/self.power
 					viz.killtimer(4)
@@ -235,24 +269,46 @@ class Controller (viz.EventClass):
 				if bullet.getX() > self.playerShip.getX()-.1 and bullet.getX() < self.playerShip.getX()+.1 and bullet.getZ() > self.playerShip.getZ()-.1 and bullet.getZ() < self.playerShip.getZ()+.1:
 					bullet.delete()
 					self.alienbullets.remove(bullet)
-					self.playerShip.delete()
+					self.playerShip.damage(math.floor(self.power/2))
+					if self.playerShip.getHP() == 0:
+						self.playerShip.delete()
+					print(self.playerShip.getHP()) #REPLACE WITH ON SCREEN TEXT
 		
 		
 		if num == 4 and not self.pause:
 			# Move aliens
 			for alien in self.aliens:
 				if alien != None:
-					alien.setPosition(alien.getX(), alien.getY(), alien.getZ() - .001)
+					alien.setPosition(alien.getX(), alien.getY(), alien.getZ() - .001, alien.getScale())
 					if self.playerShip.getX()+.04 > alien.getX()-.1 and self.playerShip.getX()-.04 < alien.getX()+.1 and self.playerShip.getZ()+.06 > alien.getZ()-.1 and self.playerShip.getZ()-.06 < alien.getZ()+.1:
-						self.playerShip.delete()
+						self.playerShip.damage(1)
+						if self.playerShip.getHP() <= 0:
+							self.playerShip.delete()
+						print(self.playerShip.getHP()) #REPLACE WITH ON SCREEN TEXT
 					if alien.isOffScreen():
-						alien.setPosition(alien.getX(), alien.getY(), 1)
-					
+						alien.setPosition(alien.getX(), alien.getY(), 1, alien.getScale())
+						
+			if self.boss != None:
+				if self.boss.getX() > -1 and self.bossLeft:
+					self.boss.setPosition(self.boss.getX() - .001, self.boss.getY(), self.boss.getZ(), self.boss.getScale())
+				else:
+					self.bossLeft = False
+				if self.boss.getX() < 1 and not self.bossLeft:
+					self.boss.setPosition(self.boss.getX() + .001, self.boss.getY(), self.boss.getZ(), self.boss.getScale())
+				else:
+					self.bossLeft = True
+				if self.playerShip.getX()+.04 > self.boss.getX()-.1 and self.playerShip.getX()-.04 < self.boss.getX()+.1 and self.playerShip.getZ()+.06 > self.boss.getZ()-.1 and self.playerShip.getZ()-.06 < self.boss.getZ()+.1:
+					self.playerShip.damage(1)
+					if self.playerShip.getHP() <= 0:
+						self.playerShip.delete()
+					print(self.playerShip.getHP()) #REPLACE WITH ON SCREEN TEXT
+				if self.boss.isOffScreen():
+					self.boss.setPosition(self.boss.getX(), self.boss.getY(), 1, self.boss.getScale())
 		
 		if num == 5:
 			for alien in self.aliens:
 				if alien != None:
-					if alien.getColor() == 'red': #Only red ships can fire
+					if alien.getColor() == 'red' or alien.getColor() == 'purple' or alien.getColor() == 'yellow': #Only red and purple ships can fire
 						index = self.aliens.index(alien) #Get the index of the current ship in our list
 						#Checks for whether a ship exists in the two spots in front, False = No Ship, True = Ship Exists
 						checkOne = False
@@ -271,32 +327,25 @@ class Controller (viz.EventClass):
 							b.setTheta(180)
 							b.setPosition(alien.getX(), alien.getY(), alien.getZ())
 							self.alienbullets.append(b)
+							
+			if self.boss != None:
+				#if self.playerShip.getX() <= self.boss.getX()+.4 and self.playerShip.getX() >= self.boss.getX()-.4 and not self.pause:
+				b = Bullet(model=self.redbullet.clone())
+				b.setTheta(180)
+				b.setPosition(self.boss.getX(), self.boss.getY(), self.boss.getZ(), 0)
+				self.alienbullets.append(b)
+				b = Bullet(model=self.redbullet.clone())
+				b.setTheta(180)
+				b.setVXVY(.02, 0, .02)
+				b.setPosition(self.boss.getX(), self.boss.getY(), self.boss.getZ())
+				self.alienbullets.append(b)
+				b = Bullet(model=self.redbullet.clone())
+				b.setTheta(180)
+				b.setVXVY(-.02, 0, .02)
+				b.setPosition(self.boss.getX(), self.boss.getY(), self.boss.getZ(), 90)
+				self.alienbullets.append(b)
+				
 			
 		if num == 6:
 			self.Fire = True
-					
-				
-	def addCoordinateAxes(self):
-		viz.startLayer(viz.LINES)
-		viz.linewidth(7)
-		viz.vertexColor( viz.RED )
-		# positive y axis
-		viz.vertex(0,0,0); 	   viz.vertex(0,20,0)
-		#positive x axis
-		viz.vertex(0,0,0); 	   viz.vertex(20,0,0)
-		#positive z axis
-		viz.vertex(0,0,0); 	   viz.vertex(0,0,20)
-		#y=1 tick mark
-		viz.vertex(-0.25,1,0); viz.vertex(0.25,1,0)
-		#y=2 tick mark
-		viz.vertex(-0.25,2,0); viz.vertex(0.25,2,0)
-		#x=1 tick mark
-		viz.vertex(1,0,-.25);  viz.vertex(1,0,.25)
-		#x=2 tick mark
-		viz.vertex(2,0,-.25);  viz.vertex(2,0,+.25)
-		#z=1 tick mark
-		viz.vertex(-.25,0,1);  viz.vertex(.25,0,1)
-		#z=2 tick mark
-		viz.vertex(-.25,0,2);  viz.vertex(.25,0,2)
-		viz.endLayer()
 				

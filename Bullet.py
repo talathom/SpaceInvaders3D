@@ -17,11 +17,11 @@ class Bullet():
 	def delete(self):
 		self.bullet.remove()
 		
-	def setPosition(self, x, y, z):
+	def setPosition(self, x, y, z, yrot=45):
 		self.x = x
 		self.y = y
 		self.z = z
-		self.bullet.setOrientation(self.x, self.y, self.z, .005, 45, 0,self.theta)
+		self.bullet.setOrientation(self.x, self.y, self.z, .005, yrot, 0,self.theta)
 		
 	def getX(self):
 		return self.x
