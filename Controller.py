@@ -29,6 +29,7 @@ class Controller (viz.EventClass):
 		self.Fire = False
 		self.start = False
 		self.pause = False
+		self.start = False #Checks whether the game has started
 		
 		self.title = True
 		self.playerSpeed = .05
@@ -45,6 +46,7 @@ class Controller (viz.EventClass):
 		self.playerShip.setPosition(0, 0, -.6)
 		
 		self.power = 3
+		self.level = 1
 		self.speed = 1/self.power
 		
 		
@@ -77,7 +79,14 @@ class Controller (viz.EventClass):
 		self.bossRight = False
 		self.bossLeft = True
 		
-		#self.spawnAliens()
+		self.levelText = None
+		self.levelMsg = "Level: 1"
+		self.hpText = None
+		self.hpMsg = "HP: 1"
+		self.scoreText = None
+		self.scoreMsg = "Score: 0"
+		self.score = 0
+		
 		self.titleScreen()
 		
 	def spawnAliens(self):
@@ -187,6 +196,16 @@ class Controller (viz.EventClass):
 			self.title = False
 			print (self.title)
 			
+		if key == viz.KEY_RETURN:
+			if not self.start:
+				self.start = True
+				self.description.remove()
+				self.spawnAliens()
+				self.levelMsg = "Level: 1"
+				self.levelText = viz.addText(self.levelMsg,viz.SCREEN,pos = [0,.9,0])
+				self.hpText = viz.addText(self.hpMsg,viz.SCREEN,pos = [.3,.9,0])
+				self.scoreText = viz.addText(self.scoreMsg,viz.SCREEN,pos = [.55,.9,0])
+			
 			
 	def onKeyUp(self, key):
 		#Controls booleans for key presses, reactions are done by timers
@@ -244,7 +263,10 @@ class Controller (viz.EventClass):
 								deadaliens += 1
 								if alien.getColor() == 'orange':
 									self.playerShip.powerUp()
-									print(self.playerShip.getHP())
+									self.updateHPText()
+							self.score += 100
+							self.updateScoreText()
+							
 					else:
 						deadaliens += 1
 				if self.boss != None:
@@ -255,9 +277,13 @@ class Controller (viz.EventClass):
 							if self.boss.getHP() <= 0:
 								self.boss.delete()
 								self.boss = None
+							self.score += 100
+							self.updateScoreText()
 				
 				if len(self.aliens) == deadaliens and self.boss == None:
 					self.power += 1
+					self.level += 1
+					self.updateLevelText()
 					self.speed = 1/self.power
 					viz.killtimer(4)
 					self.starttimer(4, self.speed, viz.FOREVER)
@@ -281,9 +307,9 @@ class Controller (viz.EventClass):
 					bullet.delete()
 					self.alienbullets.remove(bullet)
 					self.playerShip.damage(math.floor(self.power/2))
-					if self.playerShip.getHP() == 0:
+					if self.playerShip.getHP() <= 0:
 						self.playerShip.delete()
-					print(self.playerShip.getHP()) #REPLACE WITH ON SCREEN TEXT
+					self.updateHPText()
 		
 		
 		if num == 4 and not self.pause:
@@ -295,7 +321,7 @@ class Controller (viz.EventClass):
 						self.playerShip.damage(1)
 						if self.playerShip.getHP() <= 0:
 							self.playerShip.delete()
-						print(self.playerShip.getHP()) #REPLACE WITH ON SCREEN TEXT
+						self.updateHPText()
 					if alien.isOffScreen():
 						alien.setPosition(alien.getX(), alien.getY(), 1, alien.getScale())
 						
@@ -312,7 +338,7 @@ class Controller (viz.EventClass):
 					self.playerShip.damage(1)
 					if self.playerShip.getHP() <= 0:
 						self.playerShip.delete()
-					print(self.playerShip.getHP()) #REPLACE WITH ON SCREEN TEXT
+					self.updateHPText()
 				if self.boss.isOffScreen():
 					self.boss.setPosition(self.boss.getX(), self.boss.getY(), 1, self.boss.getScale())
 		
@@ -360,13 +386,22 @@ class Controller (viz.EventClass):
 		if num == 6:
 			self.Fire = True
 			
+	def updateHPText(self):
+		self.hpMsg = "HP: "+ str(int(self.playerShip.getHP()))
+		self.hpText.remove()
+		self.hpText = viz.addText(self.hpMsg,viz.SCREEN,pos = [.3,.9,0])
+		
+	def updateLevelText(self):
+		self.levelText.remove()
+		self.levelMsg = "Level: "+ str(self.level)
+		self.levelText = viz.addText(self.levelMsg ,viz.SCREEN,pos = [0,.9,0])
+		
+	def updateScoreText(self):
+		self.scoreText.remove()
+		self.scoreMsg = "Score: "+ str(self.score)
+		self.scoreText = viz.addText(self.scoreMsg,viz.SCREEN,pos = [.55,.9,0])
+		
 	def titleScreen(self):
-		#for updating score/hitpoints
-		self.string = "1"
-		self.t = viz.addText(self.string,viz.SCREEN,pos = [.4,.9,0])
-		self.t.remove()
-		self.string = "2"
-		self.t = viz.addText(self.string,viz.SCREEN,pos = [.4,.9,0])
 		 
 		
 #		self.text = viz.addText3D('Alien Invasion')
@@ -378,19 +413,20 @@ class Controller (viz.EventClass):
 #		self.text.setMatrix(mat)
 		
 		self.description = viz.addText3D('Make a last stand against an endless alien attack \n\n'
-										 +'Use the a and d keys or left and right keys to move ship and the spacebar to fire \n\n'
+										 +'Use the A and D keys or left and right keys to move ship and the spacebar to fire \n\n'
 										 +'There are 5 different types of aliens, Red: Shoots back at player, Blue: Tank takes 3 hits to kill \n\n'
-										 +'Purple: Tanks and shoots back at player,Orange: Gives players an extra hitpoint,\n Green: Boss alien gets more health the higher the level')
-											 
-										 
-		self.description.font('impact')
+										 +'Purple: Has both the Blue and Red alien abilities\n\n' 
+										 +'Orange: Gives players an extra hitpoint when hit,\n Green: Boss alien which will be a challenge to defeat\n\n'
+										 +'Press enter when you are ready to begin!')
+										
+										
+		self.description.font('Comic Sans MS')
 		self.description.alignment(viz.ALIGN_CENTER)
 		mat = viz.Matrix()
 		mat.postScale(.05,.05,.05) 
 		mat.postAxisAngle(1, 0, 0, self.theta)
 		mat.postTrans(0, .4, -.1)
 		self.description.setMatrix(mat)
-		#self.description.remove()
 		
 				
 	
