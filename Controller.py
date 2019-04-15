@@ -3,6 +3,7 @@ from Alien import *
 from Bullet import *
 import random
 import math
+import viz
 
 class Controller (viz.EventClass):
 
@@ -29,6 +30,7 @@ class Controller (viz.EventClass):
 		self.start = False
 		self.pause = False
 		
+		self.title = True
 		self.playerSpeed = .05
 		
 		#Setup default camera view
@@ -45,7 +47,9 @@ class Controller (viz.EventClass):
 		self.power = 3
 		self.speed = 1/self.power
 		
+		
 		# Start timers
+		
 		self.starttimer(1, .05, viz.FOREVER)
 		self.starttimer(2, .05, viz.FOREVER)
 		self.starttimer(3, .001, viz.FOREVER)
@@ -73,7 +77,8 @@ class Controller (viz.EventClass):
 		self.bossRight = False
 		self.bossLeft = True
 		
-		self.spawnAliens()
+		#self.spawnAliens()
+		self.titleScreen()
 		
 	def spawnAliens(self):
 		# Spawns 3x6 aliens
@@ -125,8 +130,8 @@ class Controller (viz.EventClass):
 					self.aliens[i] = Alien('orange', model=self.firstOrange.clone(), hp=2)
 				self.aliens[i].setPosition(x, 0, .5)
 				x += .25
-			
-		
+				
+	
 	def onKeyDown(self, key):
 		if key == 'a' or key == viz.KEY_LEFT:
 			self.leftUp = False
@@ -177,6 +182,11 @@ class Controller (viz.EventClass):
 			b.setPosition(self.playerShip.getX()-.02,self.playerShip.getY()+.02,self.playerShip.getZ())
 			self.bulletlist.append(b)
 			self.Fire = False
+		
+		if key == 'q':
+			self.title = False
+			print (self.title)
+			
 			
 	def onKeyUp(self, key):
 		#Controls booleans for key presses, reactions are done by timers
@@ -188,6 +198,7 @@ class Controller (viz.EventClass):
 			self.fire = False
 			
 	def onTimer(self, num):
+		
 		if num == 1: # Moves the player left/right and controls the rotation of the ship
 			if not self.leftUp and self.playerShip.canGoLeft(-0.25):
 				self.playerShip.setPosition(self.playerShip.getX()-self.playerSpeed, self.playerShip.getY(), self.playerShip.getZ())
@@ -348,4 +359,38 @@ class Controller (viz.EventClass):
 			
 		if num == 6:
 			self.Fire = True
+			
+	def titleScreen(self):
+		#for updating score/hitpoints
+		self.string = "1"
+		self.t = viz.addText(self.string,viz.SCREEN,pos = [.4,.9,0])
+		self.t.remove()
+		self.string = "2"
+		self.t = viz.addText(self.string,viz.SCREEN,pos = [.4,.9,0])
+		 
+		
+#		self.text = viz.addText3D('Alien Invasion')
+#		self.text.font('impact')
+#		mat = viz.Matrix()
+#		mat.postScale(.1,.1,.1) 
+#		mat.postAxisAngle(1, 0, 0, self.theta)
+#		mat.postTrans(-.28, .4, .1)
+#		self.text.setMatrix(mat)
+		
+		self.description = viz.addText3D('Make a last stand against an endless alien attack \n\n'
+										 +'Use the a and d keys or left and right keys to move ship and the spacebar to fire \n\n'
+										 +'There are 5 different types of aliens, Red: Shoots back at player, Blue: Tank takes 3 hits to kill \n\n'
+										 +'Purple: Tanks and shoots back at player,Orange: Gives players an extra hitpoint,\n Green: Boss alien gets more health the higher the level')
+											 
+										 
+		self.description.font('impact')
+		self.description.alignment(viz.ALIGN_CENTER)
+		mat = viz.Matrix()
+		mat.postScale(.05,.05,.05) 
+		mat.postAxisAngle(1, 0, 0, self.theta)
+		mat.postTrans(0, .4, -.1)
+		self.description.setMatrix(mat)
+		#self.description.remove()
+		
 				
+	
