@@ -73,8 +73,8 @@ class Controller (viz.EventClass):
 		self.greenbullet.setPosition(0, 2000, 0)
 		self.firstOrange = Alien('orange', modelLabel = 'powerupAlien.dae')
 		self.firstOrange.setPosition(0, 2000, 0)
-		self.firstYellow = Alien('yellow', modelLabel = 'yellowAlien.dae')
-		self.firstYellow.setPosition(0, 2000, 0)
+		self.firstGreen = Alien('green', modelLabel = 'greenAlien.dae')
+		self.firstGreen.setPosition(0, 2000, 0)
 		
 		self.boss = None
 		self.bossRight = False
@@ -95,7 +95,7 @@ class Controller (viz.EventClass):
 		
 		print("LEVEL: "+ str(self.level))
 		if self.level % 6 == 0:
-			self.boss = Alien('yellow', model=self.firstYellow.clone(), hp=self.power*6)
+			self.boss = Alien('green', model=self.firstGreen.clone(), hp=self.power*6)
 			self.boss.setPosition(0, 0, 1, scale=.0025*3)
 			self.speed = 1/(self.power/2)
 		elif not self.pause:
@@ -355,7 +355,7 @@ class Controller (viz.EventClass):
 		if num == 5 and not self.pause:
 			for alien in self.aliens:
 				if alien != None:
-					if alien.getColor() == 'red' or alien.getColor() == 'purple' or alien.getColor() == 'yellow': #Only red and purple ships can fire
+					if alien.getColor() == 'red' or alien.getColor() == 'purple' or alien.getColor() == 'green': #Only red and purple ships can fire
 						index = self.aliens.index(alien) #Get the index of the current ship in our list
 						#Checks for whether a ship exists in the two spots in front, False = No Ship, True = Ship Exists
 						checkOne = False
