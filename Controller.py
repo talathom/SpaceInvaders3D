@@ -76,10 +76,12 @@ class Controller (viz.EventClass):
 		self.firstGreen = Alien('green', modelLabel = 'greenAlien.dae')
 		self.firstGreen.setPosition(0, 2000, 0)
 		
+		#Boss object and where the boss can move
 		self.boss = None
 		self.bossRight = False
 		self.bossLeft = True
 		
+		#Initial dynamic text strings
 		self.levelText = None
 		self.levelMsg = "Level: 1"
 		self.hpText = None
@@ -88,18 +90,21 @@ class Controller (viz.EventClass):
 		self.scoreMsg = "Score: 0"
 		self.score = 0
 		
+		#Spawn the title screen
 		self.titleScreen()
 		
 	def spawnAliens(self):
 		# Spawns 3x6 aliens
 		
 		print("LEVEL: "+ str(self.level))
-		if self.level % 6 == 0:
+		if self.level % 6 == 0: #Spawns a boss at every sixth level
 			self.boss = Alien('green', model=self.firstGreen.clone(), hp=self.power*6)
 			self.boss.setPosition(0, 0, 1, scale=.0025*3)
 			self.speed = 1/(self.power/2)
+			viz.playSound('bossSpawn.wav')
 		elif not self.pause:
 			x = -.6
+			#Spawns a 3x6 wave of aliens, each alien spawn is random
 			for i in range(0, 6):
 				num = random.randint(0, 3)
 				if num == 0:
@@ -140,16 +145,18 @@ class Controller (viz.EventClass):
 					self.aliens[i] = Alien('orange', model=self.firstOrange.clone(), hp=2)
 				self.aliens[i].setPosition(x, 0, .5)
 				x += .25
+			viz.playSound('newWave.wav')
 				
 	
 	def onKeyDown(self, key):
+		#Movement keys
 		if key == 'a' or key == viz.KEY_LEFT:
 			self.leftUp = False
 		
 		if key == 'd' or key == viz.KEY_RIGHT:
 			self.rightUp = False
 			
-		if key == "p":
+		if key == "p": #Pause button
 			if self.pause and not self.gameover:
 				self.pause = False
 			else:
@@ -186,19 +193,20 @@ class Controller (viz.EventClass):
 			mat.postAxisAngle(0, 1, 0, self.theta)
 			mat.postTrans(1.5, 0, 0)
 			self.view.setMatrix(mat)
-		
+		#Player fires
 		if key == " " and self.Fire and not self.pause:
 			b = Bullet(model=self.greenbullet.clone())
 			b.setPosition(self.playerShip.getX()-.02,self.playerShip.getY()+.02,self.playerShip.getZ())
 			self.bulletlist.append(b)
 			self.Fire = False
+			viz.playSound('laser.wav')
 		
 		if key == 'q':
 			self.title = False
 			print (self.title)
 			
 		if key == viz.KEY_RETURN:
-			if not self.start:
+			if not self.start: #Change out the text on screen, disable the start text and setup dynamic text for the first time
 				self.start = True
 				self.description.remove()
 				self.spawnAliens()
@@ -231,6 +239,7 @@ class Controller (viz.EventClass):
 				self.playerShip.setPosition(self.playerShip.getX()+self.playerSpeed, self.playerShip.getY(), self.playerShip.getZ())
 				if self.playerShip.theta > 315 and self.playerShip.theta <= 360 or self.playerShip.theta <= 45:
 					self.playerShip.rotate(351)
+					
 		if num == 2 and not self.pause: #Controls passive rotation for if the player is not actively pressing buttons
 			if self.leftUp and self.rightUp:
 				if self.playerShip.theta <= 45 and self.playerShip.theta >= 0:
@@ -260,30 +269,36 @@ class Controller (viz.EventClass):
 							bullet.delete()
 							self.bulletlist.remove(bullet)
 							alien.damage()
+							viz.playSound('alienHit.wav')
 							if alien.getHP() <= 0:
 								alien.delete()
 								deadalien = self.aliens.index(alien)
 								self.aliens[deadalien] = None
 								deadaliens += 1
-								if alien.getColor() == 'orange':
+								if alien.getColor() == 'orange': #Orange aliens death triggers a powerup
 									self.playerShip.powerUp()
 									self.updateHPText()
+									viz.playSound('powerup.wav')
+								else:
+									viz.playSound('explosion.wav')
 							self.score += 100
 							self.updateScoreText()
 							
 					else:
 						deadaliens += 1
-				if self.boss != None:
+				if self.boss != None: #Check if boss alien is hit
 					if bullet.getX() > self.boss.getX()-.3 and bullet.getX() < self.boss.getX()+.3 and bullet.getZ() > self.boss.getZ()-.3 and bullet.getZ() < self.boss.getZ()+.3:
 							bullet.delete()
 							self.bulletlist.remove(bullet)
 							self.boss.damage()
+							viz.playSound('alienHit.wav')
 							if self.boss.getHP() <= 0:
 								self.boss.delete()
 								self.boss = None
+								viz.playSound('explosion.wav')
 							self.score += 100
 							self.updateScoreText()
-				
+				#Check to see if current wave is complete
 				if len(self.aliens) == deadaliens and self.boss == None:
 					self.power += 1
 					self.level += 1
@@ -311,16 +326,18 @@ class Controller (viz.EventClass):
 					bullet.delete()
 					self.alienbullets.remove(bullet)
 					self.playerShip.damage(math.floor(self.power/2))
+					viz.playSound('playerHit.wav')
 					if self.playerShip.getHP() <= 0:
 						#GAME OVER
 						self.gameover = True
 						self.pause = True
 						self.playerShip.delete()
+						viz.playSound('playerDead.wav')
 					self.updateHPText()
 		
 		
 		if num == 4 and not self.pause:
-			# Move aliens
+			# Move aliens down the Z axis
 			for alien in self.aliens:
 				if alien != None:
 					alien.setPosition(alien.getX(), alien.getY(), alien.getZ() - .001, alien.getScale())
@@ -331,11 +348,13 @@ class Controller (viz.EventClass):
 							self.gameover = True
 							self.pause = True
 							self.playerShip.delete()
+							viz.playSound('collision.wav')
 						self.updateHPText()
-					if alien.isOffScreen():
+					if alien.isOffScreen(): #Translate aliens back if off screen
 						alien.setPosition(alien.getX(), alien.getY(), 1, alien.getScale())
 						
 			if self.boss != None:
+				#Move the boss around, the boss moves left right on the X axis instead of foward on the Z
 				if self.boss.getX() > -1 and self.bossLeft:
 					self.boss.setPosition(self.boss.getX() - .001, self.boss.getY(), self.boss.getZ(), self.boss.getScale())
 				else:
@@ -348,6 +367,7 @@ class Controller (viz.EventClass):
 					self.playerShip.damage(1)
 					if self.playerShip.getHP() <= 0:
 						self.playerShip.delete()
+						viz.playSound('explosion.wav')
 					self.updateHPText()
 				if self.boss.isOffScreen():
 					self.boss.setPosition(self.boss.getX(), self.boss.getY(), 1, self.boss.getScale())
@@ -368,15 +388,16 @@ class Controller (viz.EventClass):
 						elif index < 12:
 							if self.aliens[index+6] != None:
 								checkOne = True
-									# FIRES ALIEN BULLETS, THESE CHECKS ARE REQUIRED TO ALLOW A SHIP TO FIRE
+									# FIRES ALIEN BULLETS, THESE CHECKS ARE REQUIRED TO ALLOW A SHIP TO FIRE, alien cannot fire if there is another ship in front of it
 						if not checkOne and not checkTwo and self.playerShip.getX() <= alien.getX()+.1 and self.playerShip.getX() >= alien.getX()-.1 and not self.pause:
 							b = Bullet(model=self.redbullet.clone())
 							b.setTheta(180)
 							b.setPosition(alien.getX(), alien.getY(), alien.getZ())
 							self.alienbullets.append(b)
+							viz.playSound('laser.wav')
 							
 			if self.boss != None:
-				#if self.playerShip.getX() <= self.boss.getX()+.4 and self.playerShip.getX() >= self.boss.getX()-.4 and not self.pause:
+				#The boss fires three bullets, one straight ahead and two at an angle
 				b = Bullet(model=self.redbullet.clone())
 				b.setTheta(180)
 				b.setPosition(self.boss.getX(), self.boss.getY(), self.boss.getZ(), 0)
@@ -391,11 +412,13 @@ class Controller (viz.EventClass):
 				b.setVXVY(-.02, 0, .02)
 				b.setPosition(self.boss.getX(), self.boss.getY(), self.boss.getZ(), 90)
 				self.alienbullets.append(b)
+				viz.playSound('laser.wav')
 				
 			
-		if num == 6:
+		if num == 6: #Allow player to fire
 			self.Fire = True
-			
+	
+	#Setup all possible dynamically changing text boxes
 	def updateHPText(self):
 		self.hpMsg = "HP: "+ str(int(self.playerShip.getHP()))
 		self.hpText.remove()
@@ -415,16 +438,7 @@ class Controller (viz.EventClass):
 		self.scoreText.fontSize(33)
 		
 	def titleScreen(self):
-		 
-		
-#		self.text = viz.addText3D('Alien Invasion')
-#		self.text.font('impact')
-#		mat = viz.Matrix()
-#		mat.postScale(.1,.1,.1) 
-#		mat.postAxisAngle(1, 0, 0, self.theta)
-#		mat.postTrans(-.28, .4, .1)
-#		self.text.setMatrix(mat)
-		
+		#Commands to setup the title screen
 		self.description = viz.addText3D('Make a last stand against an endless alien attack \n\n'
 										 +'Use the A and D keys or left and right keys to move ship\n\n' 
 										 +'Press the spacebar to fire \n\n'
@@ -437,7 +451,7 @@ class Controller (viz.EventClass):
 										 +'Press enter when you are ready to begin!')
 										
 										
-		self.description.font('Comic Sans MS')
+		self.description.font('Comic Sans MS') #Best font
 		self.description.alignment(viz.ALIGN_CENTER)
 		mat = viz.Matrix()
 		mat.postScale(.05,.05,.05) 
